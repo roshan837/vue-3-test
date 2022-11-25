@@ -25,10 +25,6 @@ const props = defineProps({
     }
 });
 const outer = ref(null);
-const dataToShow = ref("");
-dataToShow.value = `Web ${props.size}\n
-App ${props.size * 2}
-`
 onMounted(() => {
     let x = (props.data.errors / props.data.users) * 100;
     outer.value.style.height = `${props.size}px`;
@@ -82,7 +78,7 @@ onMounted(() => {
     align-items: center;
     font-size: 0.5rem;
     width: 3rem;
-    height: fit-content;
+    height: 0.5rem;
 
     .box {
         height: 0.4rem;

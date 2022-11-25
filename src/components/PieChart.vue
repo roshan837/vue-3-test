@@ -3,7 +3,7 @@
 </template>
 <script setup>
 import * as echarts from 'echarts';
-import { onMounted, ref } from 'vue';
+import { onMounted } from 'vue';
 const props = defineProps({
     data: {
         type: Number,
@@ -16,14 +16,14 @@ const props = defineProps({
 })
 onMounted(() => {
     console.log(props)
-    var myChart = echarts.init(document.getElementById('pie'));
+    const myChart = echarts.init(document.getElementById('pie'));
     myChart.setOption({
         series: {
             type: 'pie',
-            radius: ['75%', '90%'],
+            radius: ['100%', '80%'],
             color: props.color,
             itemStyle: {
-                borderRadius: 5
+                borderRadius: 10
             },
             label: {
                 show: false
