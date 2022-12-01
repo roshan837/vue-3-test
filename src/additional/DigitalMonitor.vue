@@ -49,7 +49,7 @@
 </template>
 
 <script setup>
-import SmallCircle from './SmallCircle.vue';
+import SmallCircle from '../components/SmallCircle.vue';
 import BigCircle from './BigCircle.vue'
 
 const data = {

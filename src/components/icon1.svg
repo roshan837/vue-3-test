@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="64" height="64" viewBox="0 0 64 64">
+  <defs>
+    <clipPath id="clip-path">
+      <rect id="Rectangle_607" data-name="Rectangle 607" width="24" height="24" transform="translate(396 312)" fill="#173753"/>
+    </clipPath>
+    <clipPath id="clip-Web_1920_1">
+      <rect width="64" height="64"/>
+    </clipPath>
+  </defs>
+  <g id="Web_1920_1" data-name="Web 1920 – 1" clip-path="url(#clip-Web_1920_1)">
+    <rect width="64" height="64" fill="#fff"/>
+    <g id="Group_962" data-name="Group 962" transform="translate(-381 -241)">
+      <circle id="Ellipse_239" data-name="Ellipse 239" cx="32" cy="32" r="32" transform="translate(381 241)" fill="#e6f0f8"/>
+      <g id="Mask_Group_2" data-name="Mask Group 2" transform="translate(5 -51)" clip-path="url(#clip-path)">
+        <circle id="Ellipse_258" data-name="Ellipse 258" cx="4.85" cy="4.85" r="4.85" transform="translate(409.235 312.955)" fill="#006c7c"/>
+        <path id="Path_330" data-name="Path 330" d="M1.958,0H7.742A1.958,1.958,0,0,1,9.7,1.958V7.742A1.958,1.958,0,0,1,7.742,9.7H1.958A1.958,1.958,0,0,1,0,7.742V1.958A1.958,1.958,0,0,1,1.958,0Z" transform="translate(397 325.416)" fill="#006c7c"/>
+        <rect id="Rectangle_600" data-name="Rectangle 600" width="6.27" height="6.27" rx="1" transform="translate(410.068 330.682) rotate(-45)" fill="#04deff"/>
+        <path id="Polygon_1" data-name="Polygon 1" d="M4.128,1.549a1,1,0,0,1,1.743,0L9.162,7.4a1,1,0,0,1-.872,1.49H1.71A1,1,0,0,1,.838,7.4Z" transform="translate(397 313.767)" fill="#04deff"/>
+      </g>
+    </g>
+  </g>
+</svg>
