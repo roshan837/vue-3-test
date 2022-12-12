@@ -10,12 +10,16 @@
   "dependencies": {
     "cytoscape": "^3.23.0",
     "cytoscape-bubblesets": "^3.2.0",
+    "cytoscape-context-menus": "^4.1.0",
+    "cytoscape-dom-node": "^1.1.0",
     "cytoscape-expand-collapse": "^4.1.0",
     "cytoscape-klay": "^3.1.4",
     "cytoscape-layers": "^2.3.1",
+    "cytoscape-popper": "^2.0.0",
     "echarts": "^5.4.0",
     "element-plus": "^2.2.19",
     "sass": "^1.56.0",
+    "tippy.js": "^6.3.7",
     "vue": "^3.2.41",
     "vue-cytoscape": "^1.0.8"
   },

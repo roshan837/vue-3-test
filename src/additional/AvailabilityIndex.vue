@@ -1,15 +1,11 @@
-<script setup>
+<script lang="ts" setup>
 import { Icon } from '@iconify/vue';
-import { ref, watch } from 'vue';
-import PieChart from './PieChart.vue';
+import { ref} from 'vue';
+import PieChart from './PieChart.vue'
+
 const percentage = ref(78);
 const growth = ref(-3);
 const color = growth.value < 0 ? ["orangered", "lightsteelblue"] : ["green", "lightsteelblue"];
-// watch([date, application], () => {
-//     percentage.value = 0;
-//     growth.value = 0;
-//     negative.value = false;
-// })
 
 </script>
 

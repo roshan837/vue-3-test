@@ -1,15 +1,33 @@
 <template>
-  <div class="min-h-screen bg-red-200 min-w-full" id="cyto">
+  <div class="flex min-w-full min-h-screen">
+    <div class="cyto" id="cyto"></div>
+    <div class="overlay p-2" id="overlay">
+      <button @click="close" class="bg-red-400 px-2">X</button>
+      <div id="overlay-data"></div>
+    </div>
   </div>
-
 </template>
-
 <script lang="ts" setup>
-import cytoscape from 'cytoscape';
-import { onMounted } from 'vue';
-import klay from 'cytoscape-klay';
+import cytoscape from 'cytoscape'
+import { onMounted } from 'vue'
+import klay from 'cytoscape-klay'
+import tippy, { roundArrow } from 'tippy.js'
+import popper from 'cytoscape-popper'
+import 'tippy.js/dist/svg-arrow.css'
+import 'tippy.js/themes/light.css'
+import cytoscapeDomNode from 'cytoscape-dom-node'
+import * as echarts from 'echarts'
+import contextMenus from 'cytoscape-context-menus'
 
-cytoscape.use(klay);
+cytoscape.use(contextMenus);
+cytoscape.use(popper)
+cytoscape.use(klay)
+cytoscape.use(cytoscapeDomNode)
+
+function close() {
+  document.getElementById('cyto').style.width = '100%'
+  document.getElementById('overlay').style.display = 'none'
+}
 const data = {
   "start": "benjenstark1",
   "persons": {
@@ -141,6 +159,7 @@ const data = {
     "uRickardLyarra": { "id": "uRickardLyarra", "partner": ["rickardstark1", "lyarrastark1inbreed"], "children": ["brandonstark5", "eddardstark1", "lyannastark2", "benjenstark4"], "unionYear": 2 },
     "uEddardUnknown": { "id": "uEddardUnknown", "partner": ["eddardstark1", "unknown8"], "children": ["jonsnow1"], "unionYear": 282 },
     "uEddardCatelyn": { "id": "uEddardCatelyn", "partner": ["eddardstark1", "catelyntully1"], "children": ["robbstark1", "sansastark2", "aryastark1", "branstark1", "rickonstark3"], "unionYear": 283 },
+    "newNode": { 'id': 'newNode', 'name': 'New Node' }
   },
   "links": [
     ["benjenstark1", "uBenjenLysa"],
@@ -218,6 +237,7 @@ const data = {
     ["uBeronLorra", "alysannestark1"],
     ["uBeronLorra", "erroldstark1"],
     ["uBeronLorra", "rodrikstark1"],
+    ['newNode', 'bennardstark1'],
     ["willamstark1", "uWillamLyanne"],
     ["lyanneglover1", "uWillamLyanne"],
     ["uWillamLyanne", "brandonstark3"],
@@ -268,6 +288,7 @@ const data = {
     ["uEddardCatelyn", "aryastark1"],
     ["uEddardCatelyn", "branstark1"],
     ["uEddardCatelyn", "rickonstark3"],
+    ['benjenstark1', 'newNode']
   ]
 }
 let persons = [];
@@ -279,48 +300,46 @@ for (const x in data.unions) {
   persons.push(data.unions[x])
   if (x !== data.unions[x]) persons.push({ ...data.unions[x], id: x })
 }
+const allNodes = {}
+function createNode(name) {
+  let div = document.createElement("div")
+  div.innerHTML = `
+  <div class="min-h-full min-w-full flex justify-center items-center text-[0.4rem] rounded-full bg-black text-white truncate">
+    ${name}
+    </div>
+  `
+  if (name.length % 2) div.setAttribute('class', 'h-[50px] w-[50px] rounded-full bg-black')
+  else div.setAttribute('class', 'h-[50px] w-[50px] bg-black')
+  return div
+}
 onMounted(() => {
   const cy = cytoscape({
     container: document.getElementById('cyto'),
     elements: [...persons.map(node => {
       return {
-        data: { group: 'nodes', id: node.id, name: node.name }
+        data: { group: 'nodes', id: node.id, name: node.name || node.id, 'birthyear': Math.floor(Math.random() * 1000) }
       }
     }),
     ...data.links.map(edge => {
       return {
-        data: { group: 'edges', id: `${edge[0] + ' ' + edge[1]}`, source: edge[0], target: edge[1] }
+        data: { group: 'edges', name: edge.id, id: `${edge[0] + ' ' + edge[1]}`, source: edge[0], target: edge[1], relation: 'parent of' }
       }
     })],
     style: [
       {
-        selector: '.selected',
-        style: {
-          'display': 'none'
-        }
-      },
-      {
         selector: 'node',
         style: {
-          'background-color': '#04deff',
-          'border-color': '#ffffff',
-          'border-width': 2,
-          'background-image': 'data:image/svg+xml;utf8,' + encodeURIComponent(`<svg width="1792" height="1792" viewBox="0 0 1792 1792" xmlns="http://www.w3.org/2000/svg"><path d="M1536 1399q0 109-62.5 187t-150.5 78h-854q-88 0-150.5-78t-62.5-187q0-85 8.5-160.5t31.5-152 58.5-131 94-89 134.5-34.5q131 128 313 128t313-128q76 0 134.5 34.5t94 89 58.5 131 31.5 152 8.5 160.5zm-256-887q0 159-112.5 271.5t-271.5 112.5-271.5-112.5-112.5-271.5 112.5-271.5 271.5-112.5 271.5 112.5 112.5 271.5z" fill="#fff"/></svg>`),
-          'background-width': '60%',
-          'background-height': '60%',
-          'color': '#333333',
           'label': 'data(name)',
           'text-valign': 'bottom',
-          'text-margin-y': 6,
+          'text-margin-y': 10,
           'text-background-color': '#ffffff',
-          'text-background-opacity': 0.5,
+          'text-background-opacity': 0.5
         }
       },
       {
         selector: 'node.hover',
         style: {
           'border-color': '#000000',
-          'text-background-color': '#eeeeee',
           'text-background-opacity': 1
         }
       },
@@ -335,64 +354,262 @@ onMounted(() => {
       },
       {
         selector: 'node.semitransp',
-        style: { 'opacity': 0.2 }
+        style: { 'opacity': 0.6 }
       },
       {
         selector: 'edge.highlight',
-        style: { 'mid-target-arrow-color': '#FFF', 'line-color': 'red', width: 5 }
+        style: {
+          'mid-target-arrow-color': '#FFF',
+          'line-color': 'red',
+          'width': 5
+        }
       },
       {
         selector: 'edge.semitransp',
-        style: { 'opacity': 0.2 }
+        style: { 'opacity': 0.6 }
       },
       {
         selector: 'node:selected',
         style: {
           'border-color': '#ff0000',
           'border-width': 6,
-          'border-opacity': 0.5
+          'border-opacity': 0.6
         }
       },
       {
         selector: 'edge',
         style: {
-          'width': 2,
-          'line-color': 'green',
+          'width': 1,
           'target-arrow-color': 'red',
           'target-arrow-shape': 'triangle',
-          'curve-style': 'taxi',
-          'label':'data(id)',
+          'curve-style': 'unbundled-bezier',
+          'label': 'data(relation)',
           'text-valign': 'top',
-          'text-margin-y': -10,
+          'font-size': 5,
+          'text-margin-y': -5,
           'text-background-color': '#ffffff',
           'text-background-opacity': 0.5
         }
       },
       {
-        selector: 'edge.hover',
+        selector: 'node.odd',
         style: {
-          'line-color': '#999999'
+          shape: 'rectangle'
+        }
+      },
+      {
+        selector: 'node.even',
+        style: {
+          shape: 'ellipse'
         }
       }
     ],
-
     layout: {
       name: 'klay',
-      spacingFactor: 3
+      spacingFactor: 2,
+      'randomize': false
     },
-    zoom: 0.5
+    zoom: 1
   })
+  cy.domNode()
+  cy.on('dbltap', 'node', e => {
+    if(document.getElementById('overlay')?.style.display=='inline' && document.getElementsByTagName('strong')[0]?.innerHTML==e.target.data().name){
+      close()
+      return
+    }
+    document.getElementById('cyto').style.width = '70%'
+    document.getElementById('overlay').style.display = 'inline'
+    document.getElementById('overlay-data').innerHTML = `
+    <strong>${e.target.data().name}</strong>
+        <div class="truncate">Parent : ${e.target.incomers().length ? e.target.incomers().nodes().map(e => e.data().name) : 'None'}</div>
+        <div class="truncate">Children : ${allNodes[e.target.id()].data.length ? allNodes[e.target.id()].data.nodes().map(e => e.data().name) : 'None'}</div>
+        <div>birth-year : ${e.target.data().birthyear ? e.target.data().birthyear : 'None'}</div>
+        <table class="table-auto">
+  <thead>
+    <tr>
+      <th>Song</th>
+      <th>Artist</th>
+      <th>Year</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>The Sliding Mr. Bones (Next Stop, Pottersville)</td>
+      <td>Malcolm Lockyer</td>
+      <td>1961</td>
+    </tr>
+    <tr>
+      <td>Witchy Woman</td>
+      <td>The Eagles</td>
+      <td>1972</td>
+    </tr>
+    <tr>
+      <td>Shining Star</td>
+      <td>Earth, Wind, and Fire</td>
+      <td>1975</td>
+    </tr>
+  </tbody>
+</table>
+<img src='./src/components/icon1.svg' alt="na">
+    `
+  })
+  cy.one('render', () => {
+    cy.elements().forEach(node => {
+      if (node.isNode()) {
+        node.data().dom = createNode(node.data().id)
+        if (node.id().length % 2) node.addClass('even')
+        else node.addClass('odd')
+      }
+      allNodes[node.id()] = {
+        data: node.outgoers(),
+        collapsed: true
+      }
+    })
+    cy.remove(cy.elements('*'))
+    cy.add({ data: { group: 'nodes', id: 'benjenstark1', name: 'Benjen Stark', dom: createNode('benjenstark1') } })
+    cy.$id('benjenstark1').addClass('odd')
+    cy.zoom(5)
+  })
+  const tipBox = document.createElement('div')
+  let tip;
   cy.on('mouseover', 'node', function (e) {
     var sel = e.target;
-    cy.elements().difference(sel.outgoers()).not(sel).addClass('semitransp');
-    sel.addClass('highlight').outgoers().addClass('highlight');
+    if (allNodes[sel.id()]?.data.length) {
+      cy.elements().difference(sel.outgoers()).not(sel).addClass('semitransp');
+      sel.addClass('highlight').outgoers().addClass('highlight');
+    }
+    tip = tippy(tipBox, {
+      appendTo: () => document.body,
+      interactive: true,
+      getReferenceClientRect: e.target.popperRef().getBoundingClientRect,
+      content: () => {
+        let content = document.createElement('div')
+        content.setAttribute('class', 'text-xs p-2 max-h-[120px] overflow-y-auto')
+        content.innerHTML = `
+        <strong>${e.target.data().name}</strong>
+        <div class="truncate">Parent : ${e.target.incomers().length ? e.target.incomers().nodes().map(e => e.data().name) : 'None'}</div>
+        <div class="truncate">Children : ${allNodes[e.target.id()].data.length ? allNodes[e.target.id()].data.nodes().map(e => e.data().name) : 'None'}</div>
+        <div>birth-year : ${e.target.data().birthyear ? e.target.data().birthyear : 'None'}</div>
+        <table class="table-auto">
+  <thead>
+    <tr>
+      <th>Song</th>
+      <th>Artist</th>
+      <th>Year</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>The Sliding Mr. Bones (Next Stop, Pottersville)</td>
+      <td>Malcolm Lockyer</td>
+      <td>1961</td>
+    </tr>
+    <tr>
+      <td>Witchy Woman</td>
+      <td>The Eagles</td>
+      <td>1972</td>
+    </tr>
+    <tr>
+      <td>Shining Star</td>
+      <td>Earth, Wind, and Fire</td>
+      <td>1975</td>
+    </tr>
+  </tbody>
+</table>
+<img src='./src/components/icon1.svg' alt="na">
+<canvas id="pie" :style="{minHeight:'50px' ,minWidth:'50px'}"></canvas>
+        `
+
+        return content;
+      },
+      arrow: roundArrow,
+      theme: 'light'
+    })
+
+    tip.show()
+    const myChart = echarts.init(document.getElementById('pie'));
+    myChart.setOption({
+      series: {
+        type: 'pie',
+        radius: ['80%', '50%'],
+        color: ['green', 'red'],
+        itemStyle: {
+          borderRadius: 10
+        },
+        label: {
+          show: false
+        },
+        data: [100, 10]
+      }
+    });
   })
+
+  cy.on('cxttap', () => {
+    if (pathFrom) {
+      contextMenu.hideMenuItem('path-from')
+      contextMenu.showMenuItem('Reselect')
+      contextMenu.showMenuItem('path-to')
+    }
+    else {
+      contextMenu.hideMenuItem('path-to')
+      contextMenu.showMenuItem('path-from')
+      contextMenu.hideMenuItem('Reselect')
+    }
+  });
+  let pathFrom = ''
+  let pathfromto = {}
+  var contextMenu = cy.contextMenus({
+    menuItems: [
+      {
+        id: 'Highlight Parent',
+        content: 'Highlight Parent',
+        tooltipText: 'Highlight Parent',
+        selector: 'node',
+        onClickFunction: function (event) { event.target.incomers().addClass('highlight') }
+      },
+      {
+        id: 'path-from',
+        content: 'path-from',
+        tooltipText: 'path-from',
+        selector: 'node',
+        onClickFunction: function (event) {
+          pathFrom = event.target.id()
+          if (pathfromto?.path?.length) pathfromto.path.removeClass('highlight')
+        }
+      },
+      {
+        id: 'path-to',
+        content: 'path-to',
+        tooltipText: 'path-to',
+        selector: 'node',
+        onClickFunction: function (event) {
+          cy.elements().removeClass('highlight')
+          pathfromto = cy.elements().aStar({ root: '#' + pathFrom, goal: '#' + event.target.id() })
+          pathfromto.path.addClass('highlight')
+          pathFrom = ''
+        }
+      },
+      {
+        id: 'Reselect',
+        content: 'Reselect',
+        tooltipText: 'Reselect',
+        selector: 'node',
+        onClickFunction: function (event) {
+          pathFrom = ''
+        }
+      }
+    ],
+    menuItemClasses: ['custom-menu-item'],
+    contextMenuClasses: ['custom-context-menu']
+  })
+
   cy.on('mouseover', 'edge', function (e) {
     var sel = e.target;
     cy.elements().difference(sel.outgoers()).not(sel).addClass('semitransp');
     sel.addClass('highlight').outgoers().addClass('highlight');
   })
   cy.on('mouseout', 'node', function (e) {
+    tip.destroy()
     var sel = e.target;
     cy.elements().removeClass('semitransp');
     sel.removeClass('highlight').outgoers().removeClass('highlight');
@@ -402,38 +619,61 @@ onMounted(() => {
     cy.elements().removeClass('semitransp');
     sel.removeClass('highlight').outgoers().removeClass('highlight');
   })
-  cy.on('tap', 'node', (evt) => {
-    try{
+  cy.on('onetap', 'node', (evt) => {
     const myNodes = cy.elements('#' + evt.target.id())
-    // console.log(myNodes.degreeCentrality())
-    if (myNodes.outgoers().classes()[0] === 'selected') {
-      myNodes.outgoers().removeClass('selected')
-      // cy.zoom({ level: 1, position: myNodes.position() });
-    }
-    else myNodes.successors().addClass('selected')
-  }catch{console.log('error')}
-  })
-  cy.on('render', () => {
-    cy.elements("node[name='Benjen Stark']").successors().addClass('selected')
-    cy.removeListener('render')
-    cy.zoom({
-      level: 1,
-      position: cy.elements("node[name='Benjen Stark']").position()
-    })
+    try {
+      if (allNodes[myNodes.id()].collapsed) {
+        cy.add(allNodes[myNodes.id()].data)
+        myNodes.outgoers().nodes().map(ele => ele.data().dom.style.display = 'flex')
+        cy.layout({
+          'name': 'klay',
+          spacingFactor: 2
+        }).run()
+      }
+      else {
+        myNodes.successors().forEach(e => {
+          allNodes[e.id()].collapsed = true
+        })
+        myNodes.successors().nodes().map(ele => ele.data().dom.style.display = 'none')
+        cy.remove(myNodes.successors())
+      }
+      allNodes[myNodes.id()].collapsed = !allNodes[myNodes.id()].collapsed
+      cy.fit(undefined, 50)
+    } catch (e) { console.log(e) }
   })
 })
-// const loopAnimation = (ele, i) => {
-//          const offset = {
-//            style: {'line-dash-offset': -10 * i }
-//           };
-//           const duration = { duration: 1000 };
-//           return ele.animation(offset, duration).play()
-//           .promise('complete')
-//           .then(() => loopAnimation(ele, i + 1));
-//       };
-
-//       var reds = cy.edges().filter(function(ele) { return ele.data('color') == 'red'; });
-//       reds.forEach((edge) => {
-//           loopAnimation(edge, 1);        
-//       });dash-edge animation for shortest path from 1 to another node
 </script>
+
+<style lang="scss">
+.cyto {
+  height: 100vh;
+  width: 100%;
+  background-color: wheat;
+}
+
+.overlay {
+  display: none;
+  height: 100vh;
+  width: 30%;
+  background-color: royalblue;
+}
+
+.custom-menu-item {
+  color: white !important;
+  width: 100%;
+  text-align: left;
+  padding: 2px 5px;
+  text-overflow: ellipsis;
+  color: black !important;
+
+  &:hover {
+    background-color: grey;
+    border-radius: 5px;
+  }
+}
+
+.custom-context-menu {
+  background-color: white !important;
+  padding-inline: 1rem;
+}
+</style>

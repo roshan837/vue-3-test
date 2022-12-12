@@ -1,5 +1,5 @@
 <template>
-    <canvas id="pie"></canvas>
+    <canvas id="pie" :style="{minHeight:'50px' ,minWidth:'50px'}"></canvas>
 </template>
 <script setup>
 import * as echarts from 'echarts';
